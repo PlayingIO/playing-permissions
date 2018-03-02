@@ -1,6 +1,6 @@
 import sift from 'sift';
 
-export class Rule {
+export default class Rule {
   constructor(params) {
     this.conditions = params.conditions;
     this.actions = params.actions;
