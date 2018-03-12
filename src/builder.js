@@ -1,28 +1,23 @@
-import assert from 'assert';
-import fp from 'mostly-func';
+function isNotEmpty(value) {
+  return typeof value === 'string' || Array.isArray(value) && value.length > 0;
+}
 
 export class AceBuilder {
   constructor() {
     this.rules = [];
   }
 
-  can(actions, subject, conditions) {
-    assert(fp.isEmpty(actions), 'actions not provided');
-    assert(fp.isEmpty(subject), 'subject not provided');
+  allow(params = {}) {
+    if (!isNotEmpty(params.actions)) throw new TypeError('params.actions not provided');
+    if (!isNotEmpty(params.subject)) throw new TypeError('params.subject not provided');
 
-    const rule = { actions, subject };
-
-    if (fp.is(Object, conditions) && conditions) {
-      rule.conditions = conditions;
-    }
-
-    this.rules.push(rule);
+    this.rules.push(params);
 
     return this;
   }
 
-  cannot(...args) {
-    const rule = this.can(...args);
+  disallow(params) {
+    const rule = this.allow(params);
     rule.inverted = true;
     return this;
   }
