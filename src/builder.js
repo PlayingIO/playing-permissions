@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fp from 'mostly-func';
 
-export class RuleBuilder {
+export class AceBuilder {
   constructor() {
     this.rules = [];
   }
