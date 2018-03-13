@@ -1,5 +1,3 @@
-import fp from 'mostly-func';
-
 export function rulesToQuery(rules, convert) {
   const query = {};
   const ignoreOperators = {};

@@ -1,21 +1,22 @@
-import { ForbiddenError } from './error';
 import { Rule } from './rule';
 
-function getSubjectTypedId(subject) {
+const getTypedSubject = (type) => (subject) => {
   if (!subject || typeof subject === 'string') {
     return subject;
   }
 
-  const Type = typeof subject === 'object' ? subject.constructor : subject;
+  if (typeof subject === 'object' && subject.hasOwnProperty(type)) {
+    return subject.id? subject[type] + ':' + subject.id : subject[type];
+  }
 
-  return Type.type + ':' + Type.id;
-}
+  return subject;
+};
 
 export class Aces {
 
-  constructor(rules, { RuleType = Rule, getSubject = getSubjectTypedId } = {}) {
+  constructor(rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
     this.RuleType = RuleType;
-    this.getSubject = getSubject;
+    this.getSubject = getTypedSubject(TypeKey);
     this.originalRules = rules;
     this.rules = {};
     this.events = {};
@@ -109,7 +110,7 @@ export class Aces {
 
   throwDisallow(action, subject) {
     if (this.disallow(action, subject)) {
-      throw new ForbiddenError(`Cannot execute "${action}" on "${this.getSubject(subject)}"`);
+      throw new Error(`Cannot execute "${action}" on "${this.getSubject(subject)}"`);
     }
   }
 

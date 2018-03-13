@@ -7,6 +7,10 @@ export class AceBuilder {
     this.rules = [];
   }
 
+  get rules() {
+    return this.rules;
+  }
+
   allow(params = {}) {
     if (!isNotEmpty(params.actions)) throw new TypeError('params.actions not provided');
     if (!isNotEmpty(params.subject)) throw new TypeError('params.subject not provided');
