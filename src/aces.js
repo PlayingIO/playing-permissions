@@ -17,10 +17,10 @@ export class Aces {
   constructor(rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
     this.RuleType = RuleType;
     this.getSubject = getTypedSubject(TypeKey);
-    this.originalRules = rules;
-    this.rules = {};
-    this.events = {};
-    this.aliases = {};
+    this._originalRules = rules;
+    this._rules = {};
+    this._events = {};
+    this._aliases = {};
     this._update(rules);
   }
 
@@ -29,8 +29,8 @@ export class Aces {
       const payload = { rules, aces: this };
 
       this.emit('update', payload);
-      this.originalRules = Object.freeze(rules.slice(0));
-      this.rules = this._buildIndexFor(this.rules);
+      this._originalRules = Object.freeze(rules.slice(0));
+      this._rules = this._buildIndexFor(this._rules);
       this.emit('updated', payload);
     }
 
@@ -63,7 +63,7 @@ export class Aces {
 
   _expandActions(rawActions) {
     const actions = Array.isArray(rawActions) ? rawActions : [rawActions];
-    const aliases = this.aliases;
+    const aliases = this._aliases;
 
     return actions.reduce((expanded, action) => {
       if (aliases.hasOwnProperty(action)) {
@@ -75,7 +75,7 @@ export class Aces {
   }
 
   get rules() {
-    return this.originalRules;
+    return this._originalRules;
   }
 
   allow(action, subject) {
@@ -101,7 +101,7 @@ export class Aces {
 
   rulesFor(action, subject) {
     const subjectId = this.getSubject(subject);
-    const rules = this.rules;
+    const rules = this._rules;
     const specificRules = rules.hasOwnProperty(subjectId) ? rules[subjectId][action] : null;
     const generalRules = rules.hasOwnProperty('all') ? rules.all[action] : null;
 
@@ -115,7 +115,7 @@ export class Aces {
   }
 
   on(event, handler) {
-    const events = this.events;
+    const events = this._events;
     let isAttached = true;
 
     if (!events[event]) {
@@ -134,7 +134,7 @@ export class Aces {
   }
 
   emit(event, payload) {
-    const handlers = this.events[event];
+    const handlers = this._events[event];
 
     if (handlers) {
       handlers.forEach(handler => handler(payload));

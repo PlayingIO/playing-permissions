@@ -4,18 +4,18 @@ function isNotEmpty(value) {
 
 export class AceBuilder {
   constructor() {
-    this.rules = [];
+    this._rules = [];
   }
 
   get rules() {
-    return this.rules;
+    return this._rules;
   }
 
   allow(params = {}) {
     if (!isNotEmpty(params.actions)) throw new TypeError('params.actions not provided');
     if (!isNotEmpty(params.subject)) throw new TypeError('params.subject not provided');
 
-    this.rules.push(params);
+    this._rules.push(params);
 
     return this;
   }
