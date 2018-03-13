@@ -1,4 +1,4 @@
-import { Rule } from './rule';
+import Rule from './rule';
 
 const getTypedSubject = (type) => (subject) => {
   if (!subject || typeof subject === 'string') {
@@ -30,7 +30,7 @@ export class Aces {
 
       this.emit('update', payload);
       this._originalRules = Object.freeze(rules.slice(0));
-      this._rules = this._buildIndexFor(this._rules);
+      this._rules = this._buildIndexFor(this._originalRules);
       this.emit('updated', payload);
     }
 
@@ -43,7 +43,7 @@ export class Aces {
 
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i];
-      const actions = this._expandActions(rule.actions);
+      const actions = rule.actions.concat(rule.alias);
 
       for (let j = 0; j < actions.length; j++) {
         const action = actions[j];
@@ -59,19 +59,6 @@ export class Aces {
     }
 
     return indexedRules;
-  }
-
-  _expandActions(rawActions) {
-    const actions = Array.isArray(rawActions) ? rawActions : [rawActions];
-    const aliases = this._aliases;
-
-    return actions.reduce((expanded, action) => {
-      if (aliases.hasOwnProperty(action)) {
-        return expanded.concat(this._expandActions(aliases[action]));
-      }
-
-      return expanded;
-    }, actions);
   }
 
   get rules() {
