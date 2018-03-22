@@ -1,7 +1,7 @@
 import sift from 'sift';
 
 export default class Rule {
-  constructor(params) {
+  constructor (params) {
     this.actions = params.actions;
     this.alias = params.alias;
     this.subject = params.subject;
@@ -12,7 +12,7 @@ export default class Rule {
     this._matches = this.conditions ? sift(this.conditions) : null;
   }
 
-  matches(object) {
+  matches (object) {
     return !this._matches || this._matches(object);
   }
 }

@@ -1,4 +1,4 @@
-export function rulesToQuery(rules, convert) {
+export function rulesToQuery (rules, convert) {
   const query = {};
   const ignoreOperators = {};
 
@@ -25,10 +25,10 @@ export function rulesToQuery(rules, convert) {
   return rules.length > 0 ? query : null;
 }
 
-function convertRuleToQuery(rule) {
+function convertRuleToQuery (rule) {
   return rule.inverted ? { $nor: [rule.conditions] } : rule.conditions;
 }
 
-export function toMongoQuery(rules) {
+export function toMongoQuery (rules) {
   return rulesToQuery(rules, convertRuleToQuery);
 }

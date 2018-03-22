@@ -14,7 +14,7 @@ const getTypedSubject = (type) => (subject) => {
 
 export class Aces {
 
-  constructor(rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
+  constructor (rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
     this.RuleType = RuleType;
     this.getSubject = getTypedSubject(TypeKey);
     this._originalRules = rules;
@@ -24,7 +24,7 @@ export class Aces {
     this._update(rules);
   }
 
-  _update(rules) {
+  _update (rules) {
     if (Array.isArray(rules)) {
       const payload = { rules, aces: this };
 
@@ -37,7 +37,7 @@ export class Aces {
     return this;
   }
 
-  _buildIndexFor(rules) {
+  _buildIndexFor (rules) {
     const indexedRules = {};
     const RuleType = this.RuleType;
 
@@ -61,11 +61,11 @@ export class Aces {
     return indexedRules;
   }
 
-  get rules() {
+  get rules () {
     return this._originalRules;
   }
 
-  allow(action, subject) {
+  allow (action, subject) {
     const subjectId = this.getSubject(subject);
     const rules = this.rulesFor(action, subject);
 
@@ -82,11 +82,11 @@ export class Aces {
     return false;
   }
 
-  disallow(action, subject) {
+  disallow (action, subject) {
     return !this.allow(action, subject);
   }
 
-  rulesFor(action, subject) {
+  rulesFor (action, subject) {
     const subjectId = this.getSubject(subject);
     const rules = this._rules;
     const specificRules = rules.hasOwnProperty(subjectId) ? rules[subjectId][action] : null;
@@ -95,13 +95,13 @@ export class Aces {
     return (generalRules || []).concat(specificRules || []);
   }
 
-  throwDisallow(action, subject) {
+  throwDisallow (action, subject) {
     if (this.disallow(action, subject)) {
       throw new Error(`Cannot execute "${action}" on "${this.getSubject(subject)}"`);
     }
   }
 
-  on(event, handler) {
+  on (event, handler) {
     const events = this._events;
     let isAttached = true;
 
@@ -120,7 +120,7 @@ export class Aces {
     };
   }
 
-  emit(event, payload) {
+  emit (event, payload) {
     const handlers = this._events[event];
 
     if (handlers) {
