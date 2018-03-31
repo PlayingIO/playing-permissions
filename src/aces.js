@@ -12,7 +12,7 @@ const getTypedSubject = (type) => (subject) => {
   return subject;
 };
 
-export class Aces {
+export default class Aces {
 
   constructor (rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
     this.RuleType = RuleType;

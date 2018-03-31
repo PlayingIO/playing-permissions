@@ -1,4 +1,12 @@
-export * from './aces';
-export * from './builder';
-export * from './query';
-export * from './rule';
+import Aces from './aces';
+import AceBuilder from './builder';
+import { rulesToQuery, toMongoQuery } from './query';
+import Rule from './rule';
+
+export {
+  Aces,
+  AceBuilder,
+  rulesToQuery,
+  toMongoQuery,
+  Rule
+}

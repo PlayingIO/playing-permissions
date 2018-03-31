@@ -2,7 +2,7 @@ function isNotEmpty (value) {
   return typeof value === 'string' || Array.isArray(value) && value.length > 0;
 }
 
-export class AceBuilder {
+export default class AceBuilder {
   constructor () {
     this._rules = [];
   }
