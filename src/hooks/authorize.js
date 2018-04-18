@@ -1,8 +1,11 @@
+import makeDebug from 'debug';
 import fp from 'mostly-func';
 import Aces from '../aces';
 import AceBuilder from '../builder';
 import { toMongoQuery } from '../query';
 import Rule from '../rule';
+
+const debug = makeDebug('playing:permissions:hooks:authorize');
 
 const defaultOptions = {
   idField: 'id',
@@ -72,8 +75,10 @@ export default function authorize (name = null, opts = {}) {
         disallow = disallow && userAces.disallow(action, resource);
         if (!resource.inherited) break;
       }
+      const resource = resources[0] && resources[0].id || resources[0];
+      debug(`Authorize: ${action} resource ${resource} is `, disallow? 'disallowed' : 'allowed');
       if (disallow) {
-        throw new Error(`You are not allowed to ${action} ${resources[0] && resources[0].id}, with ${context.path}/${context.id}`);
+        throw new Error(`You are not allowed to ${action} ${resource}, with ${context.path}/${context.id}`);
       }
     };
 
