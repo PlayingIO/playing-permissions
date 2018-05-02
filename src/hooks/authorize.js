@@ -47,7 +47,7 @@ export default function authorize (name = null, opts = {}) {
     // If it was an internal call then skip this hook
     if (!params.provider) return context;
 
-    const action = params.__action || context.method;
+    const action = params.action || context.method;
     const serviceName = name || context.path;
 
     const userPermissions = getPermissions(params.user);
