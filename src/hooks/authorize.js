@@ -115,7 +115,7 @@ export default function authorize (name = null, opts = {}) {
       return context;
     }
     // get, update, patch, remove, action
-    else { 
+    else {
       // get the resource with ancestors for checking permissions
       const resources = await getAncestors(context.id, opts.ancestors);
       throwDisallowed(action, resources);
