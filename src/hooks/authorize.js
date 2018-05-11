@@ -34,7 +34,7 @@ function defineAcesFor (permissions, { TypeKey = 'type' }) {
 }
 
 export default function authorize (name = null, opts = {}) {
-  opts = fp.assign({}, defaultOptions, opts);
+  opts = fp.assign(defaultOptions, opts);
   const TypeKey = opts.TypeKey;
 
   return async function (context) {
