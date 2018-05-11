@@ -34,7 +34,7 @@ function defineAcesFor (permissions, { TypeKey = 'type' }) {
 }
 
 export default function authorize (name = null, opts = {}) {
-  opts = fp.assign(defaultOptions, opts);
+  opts = fp.assignAll(defaultOptions, opts);
   const TypeKey = opts.TypeKey;
 
   return async function (context) {
@@ -42,7 +42,7 @@ export default function authorize (name = null, opts = {}) {
       throw new Error(`The 'authorize' hook should only be used as a 'before' hook.`);
     }
 
-    let params = fp.assign({ query: {} }, context.params);
+    let params = fp.assignAll({ query: {} }, context.params);
 
     // If it was an internal call then skip this hook
     if (!params.provider) return context;
@@ -98,7 +98,7 @@ export default function authorize (name = null, opts = {}) {
       const query = toMongoQuery(rules);
 
       if (query) {
-        params.query = fp.assign(params.query, query);
+        params.query = fp.assignAll(params.query, query);
       } else {
         context.result = {
           message: 'No data found for your account permissions',
