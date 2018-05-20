@@ -17,7 +17,7 @@ const defaultOptions = {
 
 function getPermissions (user) {
   if (user) {
-    const groupPermissions = fp.flatMap(fp.pathOr([], ['group', 'permissions']), user.groups || []);
+    const groupPermissions = fp.flatMap(fp.pathOr([], ['permissions']), user.groups || []);
     return fp.concat(groupPermissions, user.permissions || []);
   }
   return [];
