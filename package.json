@@ -24,6 +24,7 @@
     "bluebird": "^3.5.0",
     "debug": "^2.6.6",
     "esm": "^3.0.14",
+    "pluralize": "^7.0.0",
     "sift": "^5.1.0"
   },
   "devDependencies": {
