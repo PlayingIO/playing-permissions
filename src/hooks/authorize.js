@@ -94,7 +94,8 @@ export default function authorize (name = null, opts = {}) {
       // get the primary route resource as parent
       let action = context.method;
       if (context.params[opts.primary.field]) {
-        action = fp.tail(context.path.split('/')) + '/' + action;
+        // add route path to action
+        action = [fp.tail(context.path.split('/')), action].join('/');
         context.data.parent = context.params[opts.primary.field];
       }
       // get the parent for checking permissions
