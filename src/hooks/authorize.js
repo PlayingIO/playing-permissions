@@ -92,16 +92,18 @@ export default function authorize (name = null, opts = {}) {
 
     if (context.method === 'create') {
       // get the primary route resource as parent
+      let action = context.method;
       if (context.params[opts.primary.field]) {
+        action = fp.tail(context.path.split('/')) + '/' + action;
         context.data.parent = context.params[opts.primary.field];
       }
       // get the parent for checking permissions
       if (context.data[opts.parent.field]) {
         const ancestors = await getAncestors(context.data[opts.parent.field], opts.ancestors);
         context.data[opts.inherited.field] = true;
-        throwDisallowed('create', fp.concat(ancestors, [context.data]));
+        throwDisallowed(action, fp.concat(ancestors, [context.data]));
       } else {
-        throwDisallowed('create', [context.data]);
+        throwDisallowed(action, [context.data]);
       }
     }
     // find, multi update/patch/remove
