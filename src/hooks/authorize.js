@@ -1,5 +1,7 @@
 import makeDebug from 'debug';
 import fp from 'mostly-func';
+import { singular } from 'pluralize';
+
 import Aces from '../aces';
 import AceBuilder from '../builder';
 import { toMongoQuery } from '../query';
@@ -10,9 +12,10 @@ const debug = makeDebug('playing:permissions:hooks:authorize');
 const defaultOptions = {
   idField: 'id',
   TypeKey: 'type',
+  primary: { field: 'primary' },
   parent: { field: 'parent' }, // permissions from parent
   ancestors: { field: 'parent', service: null },  // more inherited permissions from ancestors
-  inherited: { field: 'inherited' }
+  inherited: { field: 'inherited' } // whether the resource inherite permissions
 };
 
 function getPermissions (user) {
@@ -57,7 +60,7 @@ export default function authorize (name = null, opts = {}) {
     const getAncestors = async (id, ancestors) => {
       const svcResource = ancestors.service
         ? context.app.service(ancestors.service)
-        : context.service;
+        : context.app.service(serviceName);
       const resource = await svcResource.get(id, {
         query: { $select: `${ancestors.field},*` }
       });
@@ -73,11 +76,12 @@ export default function authorize (name = null, opts = {}) {
       // reverse loop to check by inheritance
       for (let i = resources.length - 1; i >= 0; i--) {
         if (!resources[i]) break;
-        // add type to resource, TypeKey default to serviceName
-        const resource = fp.assoc(TypeKey, resources[i][TypeKey] || serviceName, resources[i]);
+        // add type to resource, TypeKey default to singular serviceName
+        const type = resources[i][TypeKey] || singular(serviceName);
+        const resource = fp.assoc(TypeKey, type, resources[i]);
         // check rules with resource
         disallow = disallow && userAces.disallow(action, resource);
-        if (!resource.inherited) break;
+        if (!resource[opts.inherited.field]) break;
       }
       const resource = resources[0] && resources[0].id || resources[0];
       debug(`Authorize: ${action} resource ${resource} is `, disallow? 'disallowed' : 'allowed');
@@ -87,6 +91,10 @@ export default function authorize (name = null, opts = {}) {
     };
 
     if (context.method === 'create') {
+      // get the primary route resource as parent
+      if (context.params[opts.primary.field]) {
+        context.data.parent = context.params[opts.primary.field];
+      }
       // get the parent for checking permissions
       if (context.data[opts.parent.field]) {
         const ancestors = await getAncestors(context.data[opts.parent.field], opts.ancestors);
