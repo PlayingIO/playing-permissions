@@ -10,8 +10,8 @@ const debug = makeDebug('playing:permissions:hooks:authorize');
 const defaultOptions = {
   idField: 'id',
   TypeKey: 'type',
-  parent: { field: 'parent' },
-  ancestors: { field: 'parent', service: null },
+  parent: { field: 'parent' }, // permissions from parent
+  ancestors: { field: 'parent', service: null },  // more inherited permissions from ancestors
   inherited: { field: 'inherited' }
 };
 
@@ -42,7 +42,7 @@ export default function authorize (name = null, opts = {}) {
       throw new Error(`The 'authorize' hook should only be used as a 'before' hook.`);
     }
 
-    let params = fp.assignAll({ query: {} }, context.params);
+    let params = { query: {}, ...context.params };
 
     // If it was an internal call then skip this hook
     if (!params.provider) return context;
@@ -53,14 +53,16 @@ export default function authorize (name = null, opts = {}) {
     const userPermissions = getPermissions(params.user);
     const userAces = defineAcesFor(userPermissions , { TypeKey });
 
-    const getAncestors = async (id) => {
-      const svcResource = opts.ancestors.service?
-        context.app.service(opts.ancestors.service) : context.service;
+    // get parent and ancestors permissions by populate
+    const getAncestors = async (id, ancestors) => {
+      const svcResource = ancestors.service
+        ? context.app.service(ancestors.service)
+        : context.service;
       const resource = await svcResource.get(id, {
-        query: { $select: `${opts.ancestors.field},*` }
+        query: { $select: `${ancestors.field},*` }
       });
-      if (resource[opts.ancestors.field]) {
-        return fp.concat(resource.ancestors, [fp.dissoc(opts.ancestors.field, resource)]);
+      if (resource[ancestors.field]) {
+        return fp.concat(resource.ancestors, [fp.dissoc(ancestors.field, resource)]);
       } else {
         return [resource];
       }
@@ -71,7 +73,9 @@ export default function authorize (name = null, opts = {}) {
       // reverse loop to check by inheritance
       for (let i = resources.length - 1; i >= 0; i--) {
         if (!resources[i]) break;
+        // add type to resource, TypeKey default to serviceName
         const resource = fp.assoc(TypeKey, resources[i][TypeKey] || serviceName, resources[i]);
+        // check rules with resource
         disallow = disallow && userAces.disallow(action, resource);
         if (!resource.inherited) break;
       }
