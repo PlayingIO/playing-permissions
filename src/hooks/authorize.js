@@ -64,10 +64,10 @@ export default function authorize (name = null, opts = {}) {
       const resource = await svcResource.get(id, {
         query: { $select: `${ancestors.field},*` }
       });
-      if (resource[ancestors.field]) {
+      if (resource && resource[ancestors.field]) {
         return fp.concat(resource.ancestors, [fp.dissoc(ancestors.field, resource)]);
       } else {
-        return [resource];
+        return resource? [resource] : [];
       }
     };
 
