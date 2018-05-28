@@ -50,7 +50,7 @@ export default function authorize (name = null, opts = {}) {
     // If it was an internal call then skip this hook
     if (!params.provider) return context;
 
-    const action = params.action || context.method;
+    let action = params.action || context.method;
     const serviceName = name || context.path;
 
     const userPermissions = getPermissions(params.user);
@@ -84,26 +84,25 @@ export default function authorize (name = null, opts = {}) {
         if (!resource[opts.inherited.field]) break;
       }
       const resourceId = fp.propOf('id', resources[0]);
-      debug(`Authorize: ${action} resource ${resourceId} is `, disallow? 'disallowed' : 'allowed');
+      debug(`Authorize: ${action} resource ${resourceId} is ` + disallow? 'disallowed' : 'allowed');
       if (disallow) {
         throw new Error(`Not allowed to ${action} ${resourceId} in the ${serviceName} service`);
       }
     };
 
+    // use primary as parent
+    const primary = context.params[opts.primary.field];
+    const parent = primary || context.data[opts.parent.field];
+    if (primary) {
+      // add route path to action
+      action = [fp.tail(context.path.split('/')), action].join('/');
+    }
+
     if (context.method === 'create') {
-      // get the primary route resource as parent
-      let action = context.method;
-      let data = fp.clone(context.data);
-      const primary = context.params[opts.primary.field];
-      if (primary) {
-        // add route path to action, and use primary as parent
-        action = [fp.tail(context.path.split('/')), action].join('/');
-        data.parent = primary;
-        data[opts.inherited.field] = true;
-      }
-      // get the parent for checking permissions
-      if (data[opts.parent.field]) {
-        let ancestors = await getAncestors(data[opts.parent.field], opts.ancestors);
+      if (parent) {
+        // use parent for checking permissions
+        const data = fp.assoc(opts.inherited.field, true, context.data);
+        const ancestors = await getAncestors(parent, opts.ancestors);
         if (primary && fp.isEmpty(ancestors)) {
           throw new Error(`Not allowed to ${action} with ${primary} that is not exists`);
         }
@@ -136,9 +135,21 @@ export default function authorize (name = null, opts = {}) {
     }
     // get, update, patch, remove, action
     else {
-      // get the resource with ancestors for checking permissions
-      const resources = await getAncestors(context.id, opts.ancestors);
-      throwDisallowed(action, resources);
+      if (parent) {
+        // use parent for checking permissions
+        const data = {
+          [opts.idField]: context.id,
+          [opts.inherited.field]: true
+        };
+        const ancestors = await getAncestors(parent, opts.ancestors);
+        if (primary && fp.isEmpty(ancestors)) {
+          throw new Error(`Not allowed to ${action} with ${primary} that is not exists`);
+        }
+        throwDisallowed(action, fp.concat(ancestors, [data]));
+      } else {
+        const resources = await getAncestors(context.id, opts.ancestors);
+        throwDisallowed(action, resources);
+      }
 
       return context;
     }
