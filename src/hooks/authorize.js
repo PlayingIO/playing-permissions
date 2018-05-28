@@ -83,26 +83,31 @@ export default function authorize (name = null, opts = {}) {
         disallow = disallow && userAces.disallow(action, resource);
         if (!resource[opts.inherited.field]) break;
       }
-      const resource = resources[0] && resources[0].id || resources[0];
-      debug(`Authorize: ${action} resource ${resource} is `, disallow? 'disallowed' : 'allowed');
+      const resourceId = fp.propOf('id', resources[0]);
+      debug(`Authorize: ${action} resource ${resourceId} is `, disallow? 'disallowed' : 'allowed');
       if (disallow) {
-        throw new Error(`You are not allowed to ${action} ${resource}, with ${context.path}/${context.id}`);
+        throw new Error(`Not allowed to ${action} ${resourceId} in the ${serviceName} service`);
       }
     };
 
     if (context.method === 'create') {
       // get the primary route resource as parent
       let action = context.method;
-      if (context.params[opts.primary.field]) {
-        // add route path to action
+      let data = fp.clone(context.data);
+      const primary = context.params[opts.primary.field];
+      if (primary) {
+        // add route path to action, and use primary as parent
         action = [fp.tail(context.path.split('/')), action].join('/');
-        context.data.parent = context.params[opts.primary.field];
+        data.parent = primary;
+        data[opts.inherited.field] = true;
       }
       // get the parent for checking permissions
-      if (context.data[opts.parent.field]) {
-        const ancestors = await getAncestors(context.data[opts.parent.field], opts.ancestors);
-        context.data[opts.inherited.field] = true;
-        throwDisallowed(action, fp.concat(ancestors, [context.data]));
+      if (data[opts.parent.field]) {
+        let ancestors = await getAncestors(data[opts.parent.field], opts.ancestors);
+        if (primary && fp.isEmpty(ancestors)) {
+          throw new Error(`Not allowed to ${action} with ${primary} that is not exists`);
+        }
+        throwDisallowed(action, fp.concat(ancestors, [data]));
       } else {
         throwDisallowed(action, [context.data]);
       }
