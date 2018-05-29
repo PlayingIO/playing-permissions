@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "bluebird": "^3.5.0",
     "debug": "^2.6.6",
     "esm": "^3.0.14",
     "pluralize": "^7.0.0",
