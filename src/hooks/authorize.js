@@ -120,7 +120,7 @@ export default function authorize (name = null, opts = {}) {
         params.query = fp.assignAll(params.query, query);
       } else {
         context.result = {
-          message: 'No data found for your account permissions',
+          message: 'No data found with your permissions',
           metadata: {
             total: 0,
             limit: context.params.query.$limit || 10,
