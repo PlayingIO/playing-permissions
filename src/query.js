@@ -1,3 +1,5 @@
+import fp from 'mostly-func';
+
 export function rulesToQuery (rules, convert) {
   const query = {};
   const ignoreOperators = {};
@@ -6,7 +8,7 @@ export function rulesToQuery (rules, convert) {
     const rule = rules[i];
     const op = rule.inverted ? '$and' : '$or';
 
-    if (!rule.conditions) {
+    if (fp.isEmpty(rule.conditions)) {
       if (rule.inverted) {
         return null;
       }
