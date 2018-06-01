@@ -1,6 +1,7 @@
+import assert from 'assert';
 import makeDebug from 'debug';
 import fp from 'mostly-func';
-import { singular } from 'pluralize';
+import { plural } from 'pluralize';
 
 import Aces from '../aces';
 import AceBuilder from '../builder';
@@ -36,7 +37,8 @@ function defineAcesFor (permissions, { TypeKey = 'type' }) {
   return new Aces(builder.rules, { TypeKey });
 }
 
-export default function authorize (name = null, opts = {}) {
+export default function authorize (subject, opts = {}) {
+  assert(subject, 'Subject for permission rules is not provided');
   opts = fp.assignAll(defaultOptions, opts);
   const TypeKey = opts.TypeKey;
 
@@ -51,7 +53,6 @@ export default function authorize (name = null, opts = {}) {
     if (!params.provider) return context;
 
     let action = params.action || context.method;
-    const serviceName = name || context.path;
 
     const userPermissions = getPermissions(params.user);
     const userAces = defineAcesFor(userPermissions , { TypeKey });
@@ -60,7 +61,7 @@ export default function authorize (name = null, opts = {}) {
     const getAncestors = async (id, ancestors) => {
       const svcResource = ancestors.service
         ? context.app.service(ancestors.service)
-        : context.app.service(serviceName);
+        : context.app.service(plural(subject));
       const resource = await svcResource.get(id, {
         query: { $select: `${ancestors.field},*` }
       });
@@ -76,8 +77,8 @@ export default function authorize (name = null, opts = {}) {
       // reverse loop to check by inheritance
       for (let i = resources.length - 1; i >= 0; i--) {
         if (!resources[i]) break;
-        // add type to resource, TypeKey default to singular serviceName
-        const type = resources[i][TypeKey] || singular(serviceName);
+        // add type to resource, TypeKey default to subject
+        const type = resources[i][TypeKey] || subject;
         const resource = fp.assoc(TypeKey, type, resources[i]);
         // check rules with resource
         disallow = disallow && userAces.disallow(action, resource);
@@ -86,7 +87,7 @@ export default function authorize (name = null, opts = {}) {
       const resourceId = fp.propOf('id', resources[0]);
       debug(`Authorize: ${action} resource ${resourceId} is ` + disallow? 'disallowed' : 'allowed');
       if (disallow) {
-        throw new Error(`Not allowed to ${action} ${resourceId} in the ${serviceName} service`);
+        throw new Error(`Not allowed to ${action} on ${subject} ${resourceId} in ${context.service.name} service`);
       }
     };
 
@@ -104,7 +105,7 @@ export default function authorize (name = null, opts = {}) {
         const data = fp.assoc(opts.inherited.field, true, context.data);
         const ancestors = await getAncestors(parent, opts.ancestors);
         if (primary && fp.isEmpty(ancestors)) {
-          throw new Error(`Not allowed to ${action} with ${primary} that is not exists`);
+          throw new Error(`Not allowed to ${action} on ${subject} ${primary} not exists`);
         }
         throwDisallowed(action, fp.concat(ancestors, [data]));
       } else {
@@ -113,7 +114,7 @@ export default function authorize (name = null, opts = {}) {
     }
     // find, multi update/patch/remove
     else if (!context.id) {
-      const rules = userAces.rulesFor(action, serviceName);
+      const rules = userAces.rulesFor(action, subject);
       const query = toMongoQuery(rules);
 
       if (query) {
@@ -143,7 +144,7 @@ export default function authorize (name = null, opts = {}) {
         };
         const ancestors = await getAncestors(parent, opts.ancestors);
         if (primary && fp.isEmpty(ancestors)) {
-          throw new Error(`Not allowed to ${action} with ${primary} that is not exists`);
+          throw new Error(`Not allowed to ${action} on ${subject} ${primary} not exists`);
         }
         throwDisallowed(action, fp.concat(ancestors, [data]));
       } else {
