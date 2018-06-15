@@ -93,7 +93,8 @@ export default function authorize (subject, opts = {}) {
 
     // use primary as parent
     const primary = context.params[opts.primary.field];
-    const parent = primary || context.data[opts.parent.field];
+    const parent = primary || context.params.query[opts.parent.field] ||
+      (context.data && context.data[opts.parent.field]);
     if (primary) {
       // add route path to action
       action = [fp.tail(context.path.split('/')), action].join('/');
