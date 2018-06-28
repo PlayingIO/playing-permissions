@@ -5,6 +5,10 @@ Playing Permissions
 
 Flexible and powerful permissions module for playing applications.
 
+# Documentation
+
+Please see the [documentation site](https://playingio.github.io).
+
 # Usage
 
 ## Installation
