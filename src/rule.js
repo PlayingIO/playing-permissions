@@ -9,7 +9,7 @@ export default class Rule {
     this.role = params.role;
     this.inverted = !!params.inverted;
     this.conditions = params.conditions;
-    this._matches = this.conditions ? sift(this.conditions) : null;
+    this._matches = this.conditions? sift(this.conditions) : null;
   }
 
   matches (object) {

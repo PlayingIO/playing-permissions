@@ -47,7 +47,7 @@ export default class Aces {
 
       for (let j = 0; j < actions.length; j++) {
         const action = actions[j];
-        const subjects = Array.isArray(rule.subject) ? rule.subject : [rule.subject];
+        const subjects = Array.isArray(rule.subject)? rule.subject : [rule.subject];
 
         for (let k = 0; k < subjects.length; k++) {
           const subject = subjects[k];
@@ -89,8 +89,8 @@ export default class Aces {
   rulesFor (action, subject) {
     const subjectId = this.getSubject(subject);
     const rules = this._rules;
-    const specificRules = rules.hasOwnProperty(subjectId) ? rules[subjectId][action] : null;
-    const generalRules = rules.hasOwnProperty('all') ? rules.all[action] : null;
+    const specificRules = rules.hasOwnProperty(subjectId)? rules[subjectId][action] : null;
+    const generalRules = rules.hasOwnProperty('all')? rules.all[action] : null;
 
     return (generalRules || []).concat(specificRules || []);
   }

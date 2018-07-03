@@ -6,7 +6,7 @@ export function rulesToQuery (rules, convert) {
 
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];
-    const op = rule.inverted ? '$and' : '$or';
+    const op = rule.inverted? '$and' : '$or';
 
     if (fp.isEmpty(rule.conditions)) {
       if (rule.inverted) {
@@ -24,11 +24,11 @@ export function rulesToQuery (rules, convert) {
     }
   }
 
-  return rules.length > 0 ? query : null;
+  return rules.length > 0? query : null;
 }
 
 function convertRuleToQuery (rule) {
-  return rule.inverted ? { $nor: [rule.conditions] } : rule.conditions;
+  return rule.inverted? { $nor: [rule.conditions] } : rule.conditions;
 }
 
 export function toMongoQuery (rules) {
