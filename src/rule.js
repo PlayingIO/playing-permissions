@@ -1,6 +1,6 @@
-import sift from 'sift';
+const sift = require('sift');
 
-export default class Rule {
+module.exports = class Rule {
   constructor (params) {
     this.actions = params.actions;
     this.alias = params.alias;
@@ -15,4 +15,4 @@ export default class Rule {
   matches (object) {
     return !this._matches || this._matches(object);
   }
-}
+};

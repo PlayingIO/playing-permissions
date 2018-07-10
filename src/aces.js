@@ -1,4 +1,4 @@
-import Rule from './rule';
+const Rule = require('./rule');
 
 const getTypedSubject = (type) => (subject) => {
   if (!subject || typeof subject === 'string') {
@@ -12,7 +12,7 @@ const getTypedSubject = (type) => (subject) => {
   return subject;
 };
 
-export default class Aces {
+class Aces {
 
   constructor (rules, { RuleType = Rule, TypeKey = 'type' } = {}) {
     this.RuleType = RuleType;
@@ -128,3 +128,5 @@ export default class Aces {
     }
   }
 }
+
+module.exports = Aces;

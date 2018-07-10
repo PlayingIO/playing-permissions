@@ -1,6 +1,6 @@
-import fp from 'mostly-func';
+const fp = require('mostly-func');
 
-export function rulesToQuery (rules, convert) {
+function rulesToQuery (rules, convert) {
   const query = {};
   const ignoreOperators = {};
 
@@ -31,6 +31,11 @@ function convertRuleToQuery (rule) {
   return rule.inverted? { $nor: [rule.conditions] } : rule.conditions;
 }
 
-export function toMongoQuery (rules) {
+function toMongoQuery (rules) {
   return rulesToQuery(rules, convertRuleToQuery);
 }
+
+module.exports = {
+  rulesToQuery,
+  toMongoQuery
+};

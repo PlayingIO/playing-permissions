@@ -1,10 +1,10 @@
-import Aces from './aces';
-import AceBuilder from './builder';
-import { rulesToQuery, toMongoQuery } from './query';
-import Rule from './rule';
-import authorize from './hooks/authorize';
+const Aces = require('./aces');
+const AceBuilder = require('./builder');
+const { rulesToQuery, toMongoQuery } = require('./query');
+const Rule = require('./rule');
+const authorize = require('./hooks/authorize');
 
-export {
+module.exports = {
   Aces,
   AceBuilder,
   authorize,

@@ -1,12 +1,11 @@
-import assert from 'assert';
-import makeDebug from 'debug';
-import fp from 'mostly-func';
-import { plural } from 'pluralize';
+const assert = require('assert');
+const makeDebug = require('debug');
+const fp = require('mostly-func');
+const { plural } = require('pluralize');
 
-import Aces from '../aces';
-import AceBuilder from '../builder';
-import { toMongoQuery } from '../query';
-import Rule from '../rule';
+const Aces = require('../aces');
+const AceBuilder = require('../builder');
+const { toMongoQuery } = require('../query');
 
 const debug = makeDebug('playing:permissions:hooks:authorize');
 
@@ -37,7 +36,7 @@ function defineAcesFor (permissions, { TypeKey = 'type' }) {
   return new Aces(builder.rules, { TypeKey });
 }
 
-export default function authorize (subject, opts = {}) {
+module.exports = function authorize (subject, opts = {}) {
   assert(subject, 'Subject for permission rules is not provided');
   opts = fp.assignAll(defaultOptions, opts);
   const TypeKey = opts.TypeKey;
@@ -156,4 +155,4 @@ export default function authorize (subject, opts = {}) {
       return context;
     }
   };
-}
+};
