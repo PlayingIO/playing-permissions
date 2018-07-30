@@ -7,7 +7,7 @@ Flexible and powerful permissions module for playing applications.
 
 # Documentation
 
-Please see the [documentation site](https://playingio.github.io).
+Please see the [documentation site](https://playingio.github.io) for more details.
 
 # Usage
 
