@@ -14,7 +14,7 @@ Please see the [documentation site](https://playingio.github.io) for more detail
 ## Installation
 
 ```bash
-npm install playing-permissions
+npm install playing-permissions --save
 ```
 
 # License
